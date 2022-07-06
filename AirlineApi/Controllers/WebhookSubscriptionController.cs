@@ -20,6 +20,18 @@ namespace AirlineApi.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("{secret}")]
+        public ActionResult<WebhookSubscriptionReadDto> GetSubscriptionBySecret(string secret)
+        {
+            var subscription = _context.WebhookSubscriptions
+                                .AsNoTracking()
+                                .FirstOrDefault(s => s.Secret == secret);
+
+            if(subscription is null) return NotFound();
+
+            return Ok(_mapper.Map<WebhookSubscriptionReadDto>(subscription));
+        }
+
         [HttpPost]
         public ActionResult<WebhookSubscriptionReadDto> CreateSubscription(WebhookSubscriptionCreateDto webSubscription)
         {
@@ -45,8 +57,7 @@ namespace AirlineApi.Controllers
 
                 return Ok(_mapper.Map<WebhookSubscriptionReadDto>(subscription));
             }
-
-            return NoContent();
+            return BadRequest("Subscription already exists");
         }
     }
 }
