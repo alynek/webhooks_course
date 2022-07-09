@@ -1,5 +1,6 @@
 using AirlineApi.Data;
 using AirlineApi.Dtos;
+using AirlineApi.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ namespace AirlineApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{flightCode}", Name = "GetFlightDetailsByCode")]
+        [HttpGet("{flightCode}")]
         public ActionResult<FlightDetailReadDto> GetFlightDetailsByCode(string flightCode)
         {
             var flight = _context.FlightDetails.AsNoTracking()
@@ -28,6 +29,24 @@ namespace AirlineApi.Controllers
             if(flight is null) return NotFound();
 
             return Ok(_mapper.Map<FlightDetailReadDto>(flight));
+        }
+
+        [HttpPost]
+        public ActionResult<FlightDetailReadDto> CreateFLight(FlightDetailCreateDto flight)
+        {
+            var flightDto = _context.FlightDetails.AsNoTracking()
+                            .FirstOrDefault(f => f.FlightCode == flight.FlightCode);
+
+            if(flightDto is null)
+            {
+                var flightCreated = _mapper.Map<FlightDetail>(flight);
+
+                _context.FlightDetails.Add(flightCreated);
+                _context.SaveChanges();
+
+                return Ok(_mapper.Map<FlightDetailReadDto>(flightCreated));
+            }
+            return BadRequest("Flight already exists");
         }
     }
 }
