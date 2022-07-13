@@ -10,6 +10,71 @@
 <body>
     <div class="container">
         <h1 class="display-3 text-center my-4">Pan Australian Airways</h1>
-        <h2 class="display-5 text-center my-4">Webhook registration</h2>
+        <h3 class="display-5 text-center my-4">Webhook registration</h3>
+
+        <div id="alertSuccess" class="alert alert-success">
+            <strong>Success</strong> <label id="successMessage">Webhook registered</label>
+        </div>
+
+        <div id="alertDanger" class="alert alert-danger">
+            <strong>Danger</strong> <label id="dangerMessage">Please check the log file</label>
+        </div>
+
+        <div id="registration">
+            <div class="form-group">
+                <label for="webhook">Enter your webhook URI</label>
+                <input class="form-control form-control-lg" type="text" id="webhook" placeholder="Enter URI">
+                <small class="form-text text-muted">Your webhook URI will not be shared</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="webhooktype">Webhook type</label>
+            <select class="form-control" id="webhooktype">
+                <option>Price change</option>
+                <option>Seat availability</option>
+                <option>Flight delays & disruptions</option>
+            </select>
+        </div>
+
+        <div class="mx-auto" style="width:300px;">
+            <button id="register" class="btn btn-primary btn-block text-center" type="submit" onclick="register()">Register</button>
+        </div>
     </div>
 </body>
+<script>
+    var registerButton = document.getElementById("register");
+    var webhookURI = document.getElementById("webhook");
+    var webhookType = document.getElementById("webhooktype");
+    var successBox = document.getElementById("alertSuccess");
+    var dangerBox = document.getElementById("alertDanger");
+    var dangerMessage = document.getElementById("dangerMessage");
+    var successMessage = document.getElementById("successMessage");
+    
+    disableAlert()
+
+    function register(){
+        disableAlert()
+
+        if(webhookURI.value === ""){
+            dangerMessage.innerHTML = "Enter a valid URI"
+            dangerBox.style.display = "block"
+        }
+        else{
+            fetch('https://localhost:7252/api/WebhookSubscription', {
+                method: 'POST',
+                body: JSON.stringify({webhookUri: webhookURI.value, webhookType: webhookType.value}),
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(response => response.json())
+            .then(json => console.log(json))
+            .then(err => console.log(err))
+        }
+    }
+
+    function disableAlert(){
+        successBox.style.display = 'none'
+        dangerBox.style.display = 'none'
+    }
+
+</script>
