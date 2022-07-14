@@ -1,6 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using TravelAgentApi.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<TravelAgentDbContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("TravelAgentConnection")));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
