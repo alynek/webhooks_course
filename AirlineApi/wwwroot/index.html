@@ -31,9 +31,9 @@
         <div class="form-group">
             <label for="webhooktype">Webhook type</label>
             <select class="form-control" id="webhooktype">
-                <option>Price change</option>
-                <option>Seat availability</option>
-                <option>Flight delays & disruptions</option>
+                <option value="pricechange">Price change</option>
+                <option value="availability">Seat availability</option>
+                <option value="delays">Flight delays & disruptions</option>
             </select>
         </div>
 
@@ -61,14 +61,18 @@
             dangerBox.style.display = "block"
         }
         else{
-            fetch('https://localhost:7252/api/WebhookSubscription', {
+            (async () => {
+                const rawResponse = await fetch('https://localhost:7252/api/WebhookSubscription', {
                 method: 'POST',
                 body: JSON.stringify({webhookUri: webhookURI.value, webhookType: webhookType.value}),
                 headers: {'Content-Type': 'application/json'}
-            })
-            .then(response => response.json())
-            .then(json => console.log(json))
-            .then(err => console.log(err))
+                })
+                const content = await rawResponse.json();
+
+                successMessage.innerHTML = "Webhook Registered please use secret: " + content.secret + " to validate inbound request";
+                successBox.style.display = 'block';
+            })();
+            
         }
     }
 
